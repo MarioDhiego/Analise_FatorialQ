@@ -12,6 +12,7 @@ library(dplyr)
 library(readr)
 library(readxl)
 library(ggplot2)
+library(corrplot)
 #===============================================================================
 
 #===============================================================================
@@ -242,12 +243,15 @@ dim(mydata)
 # Explore as correlações entre Q-sorts
 cor(mydata, 
     method = "pearson")
+
 #===============================================================================
+
+
 
 #===============================================================================
 # Análise Fatorial Q
 result <- qmethod(mydata,
-                  nfactors = 12,
+                  nfactors = 13,
                   extraction = "PCA",
                   rotation = "varimax", 
                   forced = FALSE,
@@ -258,12 +262,26 @@ result <- qmethod(mydata,
 
 #===============================================================================
 # características gerais/Pontuações fatoriais
+options(max.print = 2000)
 summary(result)
+        
+
 #===============================================================================
 
 #===============================================================================
-# Geral
-result$f_char$characteristics
+# Visão Geral
+result$brief
+
+# Matriz de Dados
+result$dataset
+
+# Características dos fatores
+result$f_char
+result$f_char$characteristic
+
+# Correlação entre escores z do fator
+result$f_char$cor_zsc
+
 
 # Autovalores
 result$f_char$characteristics$eigenvals
@@ -282,14 +300,24 @@ result$brief$nqsorts
 
 # 
 format(result$qdc, digits = 1, nsmall=2)
+result$qdc
 
 
-# Carga Fatoriais/Participantes
+# Valor Médio Declaração/Fator
+# (Statement z-scores)
+result$zsc
+
+# Pontuação dos Fatores p/Declaração
+# (Statement factor scores)
+result$zsc_n
+
+# Carga Fatoriais Rotacionadas/Participantes
+options(max.print = 2000)
 round(result$loa, digits = 2)
 
 # Q-sorts sinalizados: indicam TRUE
-result$flag
-round(result$flag)
+result$flag          # TRUE/FALSE
+round(result$flag)   # zero e Um
 #===============================================================================
 
 #===============================================================================
@@ -304,16 +332,10 @@ screeplot(prcomp(mydata),
           type = "lines", # "barplot"
           col = "blue", 
           pch = 16,
-          lwd = 3,
+          lwd = 3
           )
 title(xlab = "Nº de Fatores")
 #title(ylab = "Variância Explicada")
-#===============================================================================
-
-
-#===============================================================================
-# Resumo: características gerais e pontuações fatoriais
-summary(result)
 #===============================================================================
 
 
@@ -330,7 +352,7 @@ plot(result,
      cex.main = 2,
      leg.pos = "bottomright", #topleft
      cex.leg = 0.5,
-     main = "Declarações(Conseso e Distintiva) e Fatores ",
+     main = "Declarações(Consenso/Distintiva) versus Fatores ",
      lty = 2,
      lwd = 5
      )
@@ -342,8 +364,15 @@ legend("topright",
        bty = "n")
 #===============================================================================
 
+plot(result, 
+     nfactors=3, 
+     type="loa", 
+     sort="difference")
 
-
+plot(result, 
+     nfactors=3, 
+     type="zsc", 
+     sort="difference")
 
 
 #===============================================================================
