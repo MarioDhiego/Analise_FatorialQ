@@ -234,6 +234,9 @@ qsort103 <- c(4, 4, 2, 2, 1, 4, 4, 4, 4, 4, 4, 4, 2, -1, -1, -1, -1, 1, 2, 2, 1,
 mydata <- cbind(qsort1,qsort2,qsort3,qsort4,qsort5,qsort6,qsort7,qsort8,qsort9,qsort10,qsort11,qsort12,qsort13,qsort14,qsort15,qsort16,qsort17,qsort18,qsort19, qsort20,qsort21,qsort22,qsort23,qsort24,qsort25,qsort26,qsort27,qsort28,qsort29, qsort30,qsort31,qsort32,qsort33,qsort34,qsort35,qsort36,qsort37,qsort38,qsort39, qsort40,qsort41,qsort42,qsort43,qsort44,qsort45,qsort46,qsort47,qsort48,qsort49,qsort50,qsort51,qsort52,qsort53,qsort54,qsort55,qsort56,qsort57,qsort58,qsort59,qsort60,qsort61,qsort62,qsort63,qsort64,qsort65,qsort66,qsort67,qsort68,qsort69,qsort70,qsort71,qsort72,qsort73,qsort74,qsort75,qsort76,qsort77,qsort78,qsort79,qsort80,qsort81,qsort82,qsort83,qsort84,qsort85,qsort86,qsort87,qsort88,qsort89, qsort90,qsort91,qsort92,qsort93,qsort94,qsort95,qsort96,qsort97,qsort98,qsort99, qsort100,qsort101,qsort102,qsort103)
 #===============================================================================
 
+#library(devtools)
+#install_github("aiorazabala/qmethod")
+
 #===============================================================================
 # Dimensão da Matriz
 dim(mydata)
@@ -246,23 +249,25 @@ cor(mydata,
 
 #===============================================================================
 
-
-
 #===============================================================================
 # Análise Fatorial Q
+ 
+
 result <- qmethod(mydata,
                   nfactors = 13,
                   extraction = "PCA",
                   rotation = "varimax", 
                   forced = FALSE,
                   distribution = c(1:nrow(mydata)),
-                  cor.method = "pearson",
-                  silent = FALSE)
+                  cor.method = "pearson"
+                  #silent = TRUE
+                  )
 #===============================================================================
 
 #===============================================================================
 # características gerais/Pontuações fatoriais
 options(max.print = 2000)
+
 summary(result)
         
 
@@ -298,7 +303,7 @@ result$brief$nstat
 # Nº de Participantes
 result$brief$nqsorts
 
-# 
+options(max.print = 5000)
 format(result$qdc, digits = 1, nsmall=2)
 result$qdc
 
@@ -315,9 +320,14 @@ result$zsc_n
 options(max.print = 2000)
 round(result$loa, digits = 2)
 
+
+
+
 # Q-sorts sinalizados: indicam TRUE
 result$flag          # TRUE/FALSE
 round(result$flag)   # zero e Um
+rownames(result$flag)
+
 #===============================================================================
 
 #===============================================================================
@@ -381,7 +391,7 @@ scores <- cbind(round(result$zsc, digits=2), result$zsc_n)
 nfactors <- ncol(result$zsc)
 col.order <- as.vector(rbind(1:nfactors, (1:nfactors)+nfactors))
 scores <- scores[col.order]
-scores
+plot(scores)
 
 # Order the table from highest to lowest z-scores for factor 1
 scores[order(scores$zsc_f1, decreasing = T), ]
@@ -396,6 +406,13 @@ result$qdc
 
 # Declarações de Consenso
 result$qdc[which(result$qdc$dist.and.cons == "Consensus"), ]
+
+
+qfcharact(result$loa,
+          result$flagged,
+          result$zsc,
+          nfactors = 3,
+          av_rel_coef = 0.8)
 
 
 # Declarações que distinguem todos os fatores
